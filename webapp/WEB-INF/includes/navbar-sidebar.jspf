@@ -1,0 +1,95 @@
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- 顶部导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background:#1B2838;z-index:1030;">
+    <div class="container-fluid">
+        <button class="btn btn-sm btn-outline-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="${pageContext.request.contextPath}/books.jsp">
+            <span class="brand-dot"></span>
+            <span>图书借阅管理系统</span>
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <c:if test="${not empty sessionScope.user}">
+                <span class="text-white-50 d-none d-md-inline" style="font-size:.85rem;">
+                    <i class="bi bi-person-circle me-1"></i>${sessionScope.user.username}
+                </span>
+            </c:if>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                <i class="bi bi-box-arrow-right me-1"></i>退出
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- 移动端侧边栏 -->
+<div class="offcanvas offcanvas-start offcanvas-editorial d-lg-none" tabindex="-1" id="sidebarOffcanvas">
+    <div class="offcanvas-header" style="background:var(--ink);color:#fff;">
+        <h6 class="offcanvas-title fw-bold"><i class="bi bi-book-half me-2"></i>菜单</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <ul class="nav flex-column" id="sidebarNavMobile"></ul>
+    </div>
+</div>
+
+<!-- 桌面端侧边栏 -->
+<nav id="desktopSidebar" style="background:#fff;border-right:1px solid #E2E8F0;">
+    <div class="position-sticky">
+        <ul class="nav flex-column" id="sidebarNavDesktop"></ul>
+    </div>
+</nav>
+
+<script>
+window._sidebarPages = [
+    { page: 'books',          icon: 'bi-search',        label: '图书查询',   section: 'library' },
+    { page: 'recommend',      icon: 'bi-stars',         label: '图书推荐',   section: 'library' },
+    { page: 'borrow',         icon: 'bi-journal-text',   label: '我的借阅',   section: 'personal' },
+    { page: 'reservation',    icon: 'bi-calendar-check', label: '我的预约',   section: 'personal' },
+    { page: 'my-reviews',     icon: 'bi-chat-dots',      label: '我的评论',   section: 'personal' },
+    { page: 'profile',        icon: 'bi-person-gear',    label: '个人中心',   section: 'personal' },
+    { page: 'book-manage',    icon: 'bi-bookshelf',      label: '图书管理',   section: 'admin', adminOnly: true },
+    { page: 'category-manage',icon: 'bi-tags',           label: '分类管理',   section: 'admin', adminOnly: true },
+    { page: 'user-manage',    icon: 'bi-people',         label: '用户管理',   section: 'admin', adminOnly: true },
+    { page: 'admin-manage',   icon: 'bi-shield-lock',    label: '授权管理',   section: 'admin', adminOnly: true },
+    { page: 'log-manage',     icon: 'bi-clock-history',  label: '操作日志',   section: 'admin', adminOnly: true },
+    { page: 'statistics',     icon: 'bi-bar-chart-line',  label: '数据统计',   section: 'admin', adminOnly: true }
+];
+
+window._isAdmin = ${sessionScope.user != null && sessionScope.user.admin};
+window._currentPage = '${currentPage}';
+window._ctxPath = '${pageContext.request.contextPath}';
+
+var sectionLabels = {
+    library: '书库',
+    personal: '个人',
+    admin: '管理'
+};
+
+function buildSidebar() {
+    var containers = ['sidebarNavDesktop', 'sidebarNavMobile'];
+    containers.forEach(function(id) {
+        var container = document.getElementById(id);
+        if (!container) return;
+        container.innerHTML = '';
+        var lastSection = '';
+        window._sidebarPages.forEach(function(item) {
+            if (item.adminOnly && !window._isAdmin) return;
+            if (item.section !== lastSection) {
+                lastSection = item.section;
+                container.innerHTML += '<li class="sidebar-section-label">' + (sectionLabels[item.section] || '') + '</li>';
+            }
+            var activeClass = (window._currentPage === item.page) ? ' active' : '';
+            var href = window._ctxPath + '/' + item.page + '.jsp';
+            container.innerHTML +=
+                '<li class="nav-item">' +
+                '<a class="sidebar-link' + activeClass + '" href="' + href + '">' +
+                '<i class="bi ' + item.icon + '"></i><span>' + item.label + '</span>' +
+                '</a></li>';
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded', buildSidebar);
+</script>

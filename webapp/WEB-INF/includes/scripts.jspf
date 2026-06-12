@@ -1,0 +1,7 @@
+<%-- 公共脚本 --%>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- API模块 -->
+<script src="${pageContext.request.contextPath}/js/api.js?v=<%= System.currentTimeMillis() %>"></script>
+<!-- 公共函数 -->
+<script src="${pageContext.request.contextPath}/js/app-common.js?v=<%= System.currentTimeMillis() %>"></script>
